@@ -9,7 +9,7 @@ import {
   useComputedColorScheme,
   useMantineTheme,
 } from '@mantine/core';
-import { IconClock, IconMaximize, IconPageBreak } from '@tabler/icons-react';
+import { IconClock, IconFlame, IconMaximize, IconPageBreak, IconTrophy } from '@tabler/icons-react';
 import { JSX, useMemo } from 'react';
 import { BarProps } from 'recharts';
 import { useBooks } from '../../api/books';
@@ -34,6 +34,8 @@ export function StatsPage(): JSX.Element {
       totalReadingTime,
       longestDay,
       last7DaysReadTime,
+      currentDailyReadingStreak,
+      longestDailyReadingStreak,
       totalPagesRead,
     },
     isLoading: statsLoading,
@@ -48,6 +50,8 @@ export function StatsPage(): JSX.Element {
       {} as Record<string, Book>
     );
   }, [books]);
+
+  const formatStreakDays = (value: number) => `${value} day${value === 1 ? '' : 's'}`;
 
   if (booksLoading || statsLoading) {
     return (
@@ -100,6 +104,16 @@ export function StatsPage(): JSX.Element {
               label: 'Most pages in a day',
               value: mostPagesInADay ?? 'N/A',
               icon: IconMaximize,
+            },
+            {
+              label: 'Current Daily Reading Streak',
+              value: formatStreakDays(currentDailyReadingStreak),
+              icon: IconFlame,
+            },
+            {
+              label: 'Longest Daily Reading Streak',
+              value: formatStreakDays(longestDailyReadingStreak),
+              icon: IconTrophy,
             },
           ]}
         />
