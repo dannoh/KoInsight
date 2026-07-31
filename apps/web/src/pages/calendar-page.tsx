@@ -31,13 +31,9 @@ function getCalendarDateRange(date: Date): DateRange {
 export function CalendarPage(): JSX.Element {
   const { data: books, isLoading } = useBooks();
   const [dateRange, setDateRange] = useState<DateRange>(() => getCalendarDateRange(new Date()));
-  const { data: events, isLoading: eventsLoading } = usePageStats(dateRange);
+  const { data: events } = usePageStats(dateRange);
 
   const calendarEvents = useMemo<Record<string, CalendarEvent<DayData>>>(() => {
-    if (eventsLoading || !events) {
-      return {};
-    }
-
     const eventsList = events.reduce<Record<string, CalendarEvent<DayData>>>((acc, event) => {
       const date = startOfDay(event.start_time);
       const key = date.toISOString();
@@ -53,7 +49,7 @@ export function CalendarPage(): JSX.Element {
     }, {});
 
     return eventsList;
-  }, [events, eventsLoading]);
+  }, [events]);
 
   const handleDateRangeChange = useCallback((range: DateRange) => {
     setDateRange((currentRange) =>
@@ -94,7 +90,7 @@ export function CalendarPage(): JSX.Element {
     [getBookByMd5]
   );
 
-  if (isLoading || !books || !events || eventsLoading) {
+  if (isLoading || !books) {
     return (
       <Flex justify="center" align="center" h="100%">
         <Loader />

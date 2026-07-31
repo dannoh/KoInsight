@@ -39,6 +39,9 @@ export function usePageStats(range: PageStatsRange = {}) {
     () => fetchFromAPI<PageStat[]>('stats/page-stats', 'GET', query),
     {
       fallbackData: [],
+      keepPreviousData: true,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
     }
   );
 }
