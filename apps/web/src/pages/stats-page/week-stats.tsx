@@ -16,7 +16,6 @@ import {
   endOfWeek,
   format,
   formatDate,
-  getDay,
   isBefore,
   isSameDay,
   startOfDay,
@@ -29,12 +28,16 @@ import { Statistics } from '../../components/statistics/statistics';
 import { formatSecondsToHumanReadable } from '../../utils/dates';
 
 export function WeekStats({ booksByMd5 }: { booksByMd5: Record<string, Book> }) {
-  const { data: stats, isLoading: statsLoading } = usePageStats();
   const colorScheme = useComputedColorScheme();
   const { colors } = useMantineTheme();
 
   const [weekStart, setWeekStart] = useState<number>(
     startOfWeek(new Date(), { weekStartsOn: 1 }).getTime()
+  );
+
+  const weekStartDate = useMemo(
+    () => startOfWeek(weekStart, { weekStartsOn: 1 }).getTime(),
+    [weekStart]
   );
 
   const weekEnd = useMemo(() => {
@@ -43,10 +46,14 @@ export function WeekStats({ booksByMd5 }: { booksByMd5: Record<string, Book> }) 
     return rawWeekEnd <= today ? rawWeekEnd : today;
   }, [weekStart]);
 
+  const { data: stats, isLoading: statsLoading } = usePageStats({
+    start: weekStartDate,
+    end: weekEnd,
+  });
+
   const weekData = useMemo(() => {
-    const start = startOfWeek(weekStart, { weekStartsOn: 1 }).getTime();
-    return stats?.filter(({ start_time }) => start_time < weekEnd && start_time > start);
-  }, [stats, weekStart, weekEnd]);
+    return stats?.filter(({ start_time }) => start_time < weekEnd && start_time > weekStartDate);
+  }, [stats, weekStartDate, weekEnd]);
 
   const weekDaysPassed = useMemo(
     () => differenceInCalendarDays(weekEnd, weekStart) + 1,
@@ -64,7 +71,7 @@ export function WeekStats({ booksByMd5 }: { booksByMd5: Record<string, Book> }) 
           }
         }, 0) ?? 0
       ),
-    [weekData]
+    [booksByMd5, weekData]
   );
 
   const avgPagesPerDay = useMemo(() => {
@@ -84,7 +91,7 @@ export function WeekStats({ booksByMd5 }: { booksByMd5: Record<string, Book> }) 
     );
 
     return Math.round(sum(pagesPerDay) / pagesPerDay.length);
-  }, [weekData]);
+  }, [booksByMd5, weekData]);
 
   const perDay = useMemo(() => {
     const perDayResult = [];

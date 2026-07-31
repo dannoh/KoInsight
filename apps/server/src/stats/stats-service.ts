@@ -19,7 +19,7 @@ type DateKeyContext = {
 type DailyStatsSummary = {
   mostPagesInADay: ReadingPageStat;
   longestDay: ReadingDayStat;
-  currentDailyReadingStreak: number;
+  currentDailyReadingStreak: DailyReadingStreak;
   longestDailyReadingStreak: DailyReadingStreak;
 };
 
@@ -112,9 +112,9 @@ export class StatsService {
     return sum(lastSevenDays.map((s) => s.duration));
   }
 
-  static currentDailyReadingStreak(stats: PageStat[], timeZone = 'UTC') {
+  static currentDailyReadingStreak(stats: PageStat[], timeZone = 'UTC'): DailyReadingStreak {
     if (!stats?.length) {
-      return 0;
+      return { days: 0 };
     }
 
     const context = this.getDateKeyContext(timeZone);
@@ -186,7 +186,7 @@ export class StatsService {
     return longestStreak;
   }
 
-  private static getCurrentDailyReadingStreak(uniqueDays: string[], today: string) {
+  private static getCurrentDailyReadingStreak(uniqueDays: string[], today: string): DailyReadingStreak {
     const currentUniqueDays = uniqueDays.filter((day) => day <= today);
     const latestReadingDay = currentUniqueDays[currentUniqueDays.length - 1];
 
@@ -194,19 +194,25 @@ export class StatsService {
       latestReadingDay === undefined ||
       differenceInCalendarDays(this.dateKeyToDate(today), this.dateKeyToDate(latestReadingDay)) > 1
     ) {
-      return 0;
+      return { days: 0 };
     }
 
     const readingDays = new Set(currentUniqueDays);
     let streak = 0;
     let currentDay = latestReadingDay;
+    let start = latestReadingDay;
 
     while (readingDays.has(currentDay)) {
       streak += 1;
+      start = currentDay;
       currentDay = this.previousDateKey(currentDay);
     }
 
-    return streak;
+    return {
+      days: streak,
+      start,
+      end: latestReadingDay,
+    };
   }
 
   private static getReadingDayTotals(

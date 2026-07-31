@@ -69,6 +69,9 @@ export function StatsPage(): JSX.Element {
       ? `${formatDateKey(dateRange.start)} - ${formatDateKey(dateRange.end)}`
       : 'N/A';
 
+  const formatStartedOn = (dateKey?: string) =>
+    dateKey ? `Started on ${formatDateKey(dateKey)}` : undefined;
+
   if (booksLoading || statsLoading) {
     return (
       <Flex justify="center" align="center" h="100%">
@@ -128,7 +131,8 @@ export function StatsPage(): JSX.Element {
             },
             {
               label: 'Current Daily Reading Streak',
-              value: formatStreakDays(currentDailyReadingStreak),
+              value: formatStreakDays(currentDailyReadingStreak.days),
+              detail: formatStartedOn(currentDailyReadingStreak.start),
               icon: IconFlame,
             },
             {

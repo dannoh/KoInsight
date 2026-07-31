@@ -34,7 +34,7 @@ export type GetStatsSummaryResponse = {
   totalReadingTime: number;
   longestDay: ReadingDayStat;
   last7DaysReadTime: number;
-  currentDailyReadingStreak: number;
+  currentDailyReadingStreak: DailyReadingStreak;
   longestDailyReadingStreak: DailyReadingStreak;
   totalPagesRead: number;
 };
