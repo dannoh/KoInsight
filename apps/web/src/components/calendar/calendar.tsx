@@ -1,4 +1,4 @@
-import { Button, Flex } from '@mantine/core';
+import { Button, Flex, Text } from '@mantine/core';
 import { MonthPickerInput } from '@mantine/dates';
 import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import clsx from 'clsx';
@@ -152,6 +152,9 @@ export function Calendar<T>({
             }}
           />
         </Flex>
+        <Text component="h2" visibleFrom="sm" className={style.CalendarMonthTitle}>
+          {format(currentDate, 'MMMM yyyy')}
+        </Text>
         <Button
           size="xs"
           color="violet"
