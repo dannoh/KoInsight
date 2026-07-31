@@ -15,6 +15,13 @@ type DayData = {
 };
 
 export function BookPageCalendar({ book }: BookPageCalendarProps): JSX.Element {
+  const lastReadTimestamp = book.stats.reduce(
+    (latest, event) => Math.max(latest, event.start_time),
+    0
+  );
+  const defaultDate = lastReadTimestamp ? new Date(lastReadTimestamp) : undefined;
+  const defaultDateKey = defaultDate?.toISOString() ?? 'today';
+
   const calendarEvents = book.stats.reduce<Record<string, CalendarEvent<DayData>>>((acc, event) => {
     const date = startOfDay(event.start_time);
     const key = date.toISOString();
@@ -28,7 +35,9 @@ export function BookPageCalendar({ book }: BookPageCalendarProps): JSX.Element {
 
   return (
     <Calendar<DayData>
+      key={defaultDateKey}
       events={calendarEvents}
+      defaultDate={defaultDate}
       dayRenderer={(data) => (
         <>
           <IconClock size={14} />{' '}

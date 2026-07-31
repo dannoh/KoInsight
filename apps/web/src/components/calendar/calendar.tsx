@@ -25,6 +25,7 @@ export type CalendarEvent<T> = {
 
 export type CalendarProps<T> = {
   events: Record<string, CalendarEvent<T>>;
+  defaultDate?: Date;
   dayRenderer?: (data: T) => ReactNode;
   onDateRangeChange?: (range: { start: number; end: number }) => void;
 };
@@ -55,10 +56,11 @@ function parseMonthValue(value: string | null) {
 
 export function Calendar<T>({
   events,
+  defaultDate,
   dayRenderer,
   onDateRangeChange,
 }: CalendarProps<T>): JSX.Element {
-  const [currentDate, setCurrentDate] = useState(() => getMonthAnchor(new Date()));
+  const [currentDate, setCurrentDate] = useState(() => getMonthAnchor(defaultDate ?? new Date()));
 
   const startDate = startOfWeek(startOfMonth(currentDate), {
     locale: { options: { weekStartsOn: 1 } },
