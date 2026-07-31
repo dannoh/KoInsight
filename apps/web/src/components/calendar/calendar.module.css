@@ -13,6 +13,14 @@
   border-bottom: 1px solid var(--border-color);
 }
 
+.CalendarMonthTitle {
+  flex: 1;
+  margin: 0;
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
 .CalendarGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
