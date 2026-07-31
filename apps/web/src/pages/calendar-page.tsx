@@ -2,9 +2,9 @@ import { PageStat } from '@koinsight/common/types';
 import { Book } from '@koinsight/common/types/book';
 import { Anchor, Flex, Loader, Title } from '@mantine/core';
 import { IconClock } from '@tabler/icons-react';
-import { startOfDay } from 'date-fns/startOfDay';
+import { endOfMonth, endOfWeek, startOfDay, startOfMonth, startOfWeek } from 'date-fns';
 import { sum, uniq } from 'ramda';
-import { JSX, useCallback, useMemo } from 'react';
+import { JSX, useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { useBooks } from '../api/books';
 import { usePageStats } from '../api/use-page-stats';
@@ -16,9 +16,22 @@ type DayData = {
   events: PageStat[];
 };
 
+type DateRange = {
+  start: number;
+  end: number;
+};
+
+function getCalendarDateRange(date: Date): DateRange {
+  return {
+    start: startOfWeek(startOfMonth(date), { locale: { options: { weekStartsOn: 1 } } }).getTime(),
+    end: endOfWeek(endOfMonth(date), { locale: { options: { weekStartsOn: 1 } } }).getTime(),
+  };
+}
+
 export function CalendarPage(): JSX.Element {
   const { data: books, isLoading } = useBooks();
-  const { data: events, isLoading: eventsLoading } = usePageStats();
+  const [dateRange, setDateRange] = useState<DateRange>(() => getCalendarDateRange(new Date()));
+  const { data: events, isLoading: eventsLoading } = usePageStats(dateRange);
 
   const calendarEvents = useMemo<Record<string, CalendarEvent<DayData>>>(() => {
     if (eventsLoading || !events) {
@@ -41,6 +54,12 @@ export function CalendarPage(): JSX.Element {
 
     return eventsList;
   }, [events, eventsLoading]);
+
+  const handleDateRangeChange = useCallback((range: DateRange) => {
+    setDateRange((currentRange) =>
+      currentRange.start === range.start && currentRange.end === range.end ? currentRange : range
+    );
+  }, []);
 
   const getBookByMd5 = useCallback(
     (md5: Book['md5']) => books?.find((book) => book.md5 === md5),
@@ -89,6 +108,7 @@ export function CalendarPage(): JSX.Element {
       <Calendar<DayData>
         events={calendarEvents}
         dayRenderer={(data) => getBookNames(data).map((el) => <div>{el}</div>)}
+        onDateRangeChange={handleDateRangeChange}
       />
     </>
   );

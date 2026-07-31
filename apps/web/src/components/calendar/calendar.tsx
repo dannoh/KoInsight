@@ -26,16 +26,27 @@ export type CalendarEvent<T> = {
 export type CalendarProps<T> = {
   events: Record<string, CalendarEvent<T>>;
   dayRenderer?: (data: T) => ReactNode;
+  onDateRangeChange?: (range: { start: number; end: number }) => void;
 };
 
-export function Calendar<T>({ events, dayRenderer }: CalendarProps<T>): JSX.Element {
+export function Calendar<T>({
+  events,
+  dayRenderer,
+  onDateRangeChange,
+}: CalendarProps<T>): JSX.Element {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const startDate = startOfWeek(startOfMonth(currentDate), {
     locale: { options: { weekStartsOn: 1 } },
   });
   const endDate = endOfWeek(endOfMonth(currentDate), { locale: { options: { weekStartsOn: 1 } } });
+  const startTimestamp = startDate.getTime();
+  const endTimestamp = endDate.getTime();
   const dates = [];
+
+  useEffect(() => {
+    onDateRangeChange?.({ start: startTimestamp, end: endTimestamp });
+  }, [endTimestamp, onDateRangeChange, startTimestamp]);
 
   let day = startDate;
   while (day <= endDate) {
