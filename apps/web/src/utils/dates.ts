@@ -4,7 +4,13 @@ import { formatDuration } from 'date-fns/formatDuration';
 import { intervalToDuration } from 'date-fns/intervalToDuration';
 
 export function getDuration(seconds: number): Duration {
-  return intervalToDuration({ start: 0, end: seconds * 1000 });
+  const totalSeconds = Math.max(0, Math.floor(seconds));
+
+  return {
+    hours: Math.floor(totalSeconds / 3600),
+    minutes: Math.floor((totalSeconds % 3600) / 60),
+    seconds: totalSeconds % 60,
+  };
 }
 
 export function shortDuration(duration: Duration): string {

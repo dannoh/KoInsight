@@ -1,4 +1,4 @@
-import { Book, BookWithData } from '@koinsight/common/types';
+import { BookWithData } from '@koinsight/common/types';
 import {
   Button,
   Checkbox,
@@ -167,15 +167,18 @@ export function BooksPage(): JSX.Element {
               w={150}
               value={sortBy.key}
               allowDeselect={false}
-              onChange={(value) => setSortBy((prev) => ({ ...prev, key: value as keyof Book }))}
+              onChange={(value) =>
+                setSortBy((prev) => ({ ...prev, key: value as keyof BookWithData }))
+              }
               data={
                 [
                   { label: 'Added', value: 'id' },
                   { label: 'Title', value: 'title' },
                   { label: 'Author', value: 'authors' },
+                  { label: 'Pages', value: 'total_pages' },
                   { label: 'Read time', value: 'total_read_time' },
                   { label: 'Last open', value: 'last_open' },
-                ] as { label: string; value: keyof Book }[]
+                ] as { label: string; value: keyof BookWithData }[]
               }
               defaultValue="title"
             />
